@@ -40,8 +40,8 @@ class SSHCommandCommand extends Command
     {
         $this->input = $input;
         $this->output = $output;
-        $config = Yaml::parse(file_get_contents($input->getArgument('config')));
 
+        $config = $this->readConfig();
         if (!$config) {
             $output->writeln("<error>配置文件不存在</error>");
             return;
@@ -102,6 +102,19 @@ class SSHCommandCommand extends Command
         } else {
             $this->output->writeln("连通正常.....");
         }
+    }
+
+    protected function readConfig()
+    {
+        $configFile = $this->input->getArgument('config');
+        $config = '';
+        if (file_exists(__DIR__.'/../'.$configFile)) {
+            $config = Yaml::parse(file_get_contents(__DIR__.'/../'.$configFile));
+        } else {
+            $config = Yaml::parse(file_get_contents($configFile));
+        }
+
+        return $config;
     }
 
     public function getIpList($ipString)
