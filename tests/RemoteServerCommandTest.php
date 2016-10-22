@@ -29,6 +29,7 @@ class SSHCommandCommandTest extends \PHPUnit_Framework_TestCase
         $output = <<<'EOF'
 开始测试服务器SSH连通性...
 连通正常.....
+try6:执行命令 - 'ls /'
 
 EOF;
 

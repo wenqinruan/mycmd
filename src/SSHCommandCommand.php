@@ -14,6 +14,8 @@ class SSHCommandCommand extends Command
     protected $ipList = array();
     protected $username = '';
     protected $password = '';
+    protected $privatekey = '';
+    protected $cmd = '';
     protected $sshSessionList = array();
     protected $isConnectedOK = true;
     protected $input;
@@ -49,6 +51,7 @@ class SSHCommandCommand extends Command
         $this->username = $config['username'];
         $this->password = $config['password'];
         $this->privatekey = $config['privatekey'];
+        $this->cmd = $config['cmd'];
 
         if (!$this->username) {
             $this->username = trim(shell_exec('whoami'));
@@ -58,7 +61,18 @@ class SSHCommandCommand extends Command
         if (!$this->isConnectedOK) {
             return;
         }
+
+
+        $this->runCMD();
   
+    }
+
+    protected function runCMD()
+    {
+        foreach ($this->sshSessionList as $ip => $ssh) {
+            $this->output->writeln("{$ip}:执行命令 - '{$this->cmd}'");
+            echo $ssh->exec($this->cmd);
+        }
     }
 
     protected function tesConnected()
@@ -80,7 +94,7 @@ class SSHCommandCommand extends Command
                 $this->output->writeln("无法连通IP：".$ip);
             }
 
-            $this->sshSessionList[] = $ssh;
+            $this->sshSessionList[$ip] = $ssh;
         }
 
         if (!$this->isConnectedOK) {
