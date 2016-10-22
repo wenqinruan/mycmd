@@ -78,7 +78,7 @@ class SSHCommandCommand extends Command
         if (!$this->isConnectedOK) {
             $this->output->writeln("服务器SSH连通有问题，请检查...");
         } else {
-            $this->output->writeln("开始测试服务器SSH连通性...");
+            $this->output->writeln("连通正常.....");
         }
     }
 
