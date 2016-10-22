@@ -23,13 +23,4 @@ class SSH2Test extends \PHPUnit_Framework_TestCase
         }
         
     }
-
-    public function testLoginWithNoPassword()
-    {
-        $ssh = new \phpseclib\Net\SSH2('try6');
-        if (!$ssh->login('root')) {
-            exit('Login Failed');
-        }
-        
-    }
 }

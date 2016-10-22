@@ -2,6 +2,7 @@
 
 namespace Ruanwenqin\Command;
 
+use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,10 +24,7 @@ class SSHCommandCommand extends Command
         $this
         // the name of the command (the part after "bin/console")
         ->setName('ssh:cmd')
-        ->addArgument('ips', InputArgument::REQUIRED, '远程服务器的IP，用逗号隔开，也可以是一个包含服务器IP的文件绝对路径')
-        ->addArgument('cmd', InputArgument::REQUIRED, '要执行的命令')
-        ->addArgument('username', InputArgument::OPTIONAL, '运行命令的用户，默认使用运行此command的用户')
-        ->addArgument('password', InputArgument::OPTIONAL, '远程服务器的密码，默认密码为空')
+        ->addArgument('config', InputArgument::REQUIRED, '配置文件')
 
         // the short description shown while running "php bin/console list"
         ->setDescription('给远程服务器发送命令')
@@ -40,9 +38,17 @@ class SSHCommandCommand extends Command
     {
         $this->input = $input;
         $this->output = $output;
-        $this->ipList = $this->getIpList($input->getArgument('ips'));
-        $this->password = $input->getArgument('password');
-        $this->username = $input->getArgument('username');
+        $config = Yaml::parse(file_get_contents($input->getArgument('config')));
+
+        if (!$config) {
+            $output->writeln("<error>配置文件不存在</error>");
+            return;
+        }
+
+        $this->ipList = $this->getIpList($config['ips']);
+        $this->username = $config['username'];
+        $this->password = $config['password'];
+        $this->privatekey = $config['privatekey'];
 
         if (!$this->username) {
             $this->username = trim(shell_exec('whoami'));
@@ -62,10 +68,12 @@ class SSHCommandCommand extends Command
             $ssh = new SSH2($ip);
 
             $isOk = false;
-            if ($this->password) {
-                $isOk = $ssh->login($this->username, $this->password);
+            if ($this->privatekey) {
+                $key = new \phpseclib\Crypt\RSA();
+                $key->loadKey(file_get_contents($this->privatekey));
+                $isOk = $ssh->login($this->username, $key);
             } else {
-                $isOk = $ssh->login($this->username);
+                $isOk = $ssh->login($this->username, $this->password);
             }
             if (!$isOk) {
                 $this->isConnectedOK = false;

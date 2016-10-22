@@ -1,0 +1,5 @@
+ips: 'try6'
+username: root
+privatekey: '/Users/ruanwenqin/.ssh/id_rsa'
+password: topxiaxia
+cmd: 'ls /'

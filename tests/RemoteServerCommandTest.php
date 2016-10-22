@@ -24,13 +24,14 @@ class SSHCommandCommandTest extends \PHPUnit_Framework_TestCase
     public function testRun()
     {
         $commandTester = $this->createSSHCommandCommand();
-        $commandTester->execute(array('ips' => 'try6', 'cmd' => 'ls', 'username' => 'root', 'password' => 'topxiaxia'));
+        $commandTester->execute(array('config' => __DIR__.'/fixtures/ssh-cmd-test.yml'));
 
         $output = <<<'EOF'
 开始测试服务器SSH连通性...
 连通正常.....
 
 EOF;
+
         $this->assertEquals($output, $commandTester->getDisplay());
     }
 
